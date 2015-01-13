@@ -1,0 +1,39 @@
+{
+  "name": "ascore",
+  "description": "JavaScript's asynchronous functional programming helper library.",
+  "homepage": "http://ascorejs.org",
+  "keywords": [
+    "util",
+    "functional",
+    "async",
+    "server"
+  ],
+  "author": {
+    "name": "Koen Weddepohl",
+    "email": "kweddepohl@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git:"
+  },
+  "main": "ascore.js",
+  "version": "0.1.8",
+  "licenses": [
+    {
+      "type": "MIT"
+    }
+  ],
+  "files": [
+    "README.md",
+    "license.txt",
+    "ascore.js",
+    "ascore.coffee",
+    "test/ascore.test.coffee"
+  ],
+  "readme": "",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://"
+  },
+  "_id": "ascore@0.1.8"
+}
