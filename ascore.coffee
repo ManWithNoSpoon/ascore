@@ -2,10 +2,12 @@ LIMIT_MAX_RUNNING_DEFAULT = 16
 
 # Use embedded JavaScript to declare _ and exports, so that they are only
 # declared as local variables if they haven't been defined by the environment:
-`if (require) var _ = require('underscore');
+`
+if (require) var _ = require('underscore');
 
 //if (typeof(window) != 'undefined' && typeof(exports) == 'undefined')
-//	var exports = window.A_ = {};`
+//	var exports = window.A_ = {};
+`
 
 ###
 Most functions passed to Ascore's API have to be asynchronous. (Not really, but

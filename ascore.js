@@ -7,10 +7,12 @@
 
   LIMIT_MAX_RUNNING_DEFAULT = 16;
 
-  if (require) var _ = require('underscore');
+  
+if (require) var _ = require('underscore');
 
 //if (typeof(window) != 'undefined' && typeof(exports) == 'undefined')
-//	var exports = window.A_ = {};;
+//	var exports = window.A_ = {};
+;
 
 
   /*
