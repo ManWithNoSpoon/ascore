@@ -2,13 +2,10 @@ LIMIT_MAX_RUNNING_DEFAULT = 16
 
 # Use embedded JavaScript to declare _ and exports, so that they are only
 # declared as local variables if they haven't been defined by the environment:
-`if (require) {
-	var _ = require('underscore');
-}
+`if (require) var _ = require('underscore');
 
-if (typeof(window) != 'undefined' && typeof(exports) == 'undefined') {
-	var exports = window.A_ = {};
-}`
+//if (typeof(window) != 'undefined' && typeof(exports) == 'undefined')
+//	var exports = window.A_ = {};`
 
 ###
 Most functions passed to Ascore's API have to be asynchronous. (Not really, but
@@ -233,6 +230,10 @@ exports.mapper       = mapper       = makeMapperFun map
 exports.sloppyMapper = sloppyMapper = makeMapperFun sloppyMap
 
 
+###
+Like each or map, but results are passed to pushItem, in order, when they become
+available. (Any errors are passed to doneCb.)
+###
 exports.push =
 push = (arr, doItem, pushItem, doneCb) ->
 	if not _.isFunction doneCb
@@ -279,7 +280,7 @@ _push = (arr, doItem, pushItem, doneCb) ->
 					else if not --waiting
 						doneCb null
 
-
+###
 exports.sloppySlide =
 _slide = (arr, pushItemFuns..., doneCb) ->
 	vals    = [ arr ]
@@ -303,6 +304,7 @@ _slide = (arr, pushItemFuns..., doneCb) ->
 				
 				if not --waiting
 					doneCb null
+###
 
 exports.eachPair =
 eachPair = (arr, doPair, eachPairCb) ->
@@ -510,7 +512,7 @@ makeLobFun = (collect) ->
 exports.lob  =  lob = makeLobFun  collect
 exports.flob = flob = makeLobFun fcollect
 
-exports.lobber  =
+exports.lobber =
 lobber = (ctx = {}) ->
 	makeLobFun  collector ctx
 exports.flobber =

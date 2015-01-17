@@ -52,6 +52,22 @@ COLLECT
 	}, (err, fileInfo) ->
 		console.log err or fileInfo
 
+
+LOB
+Works like collect, but all values are bound to the this in the callback.
+	
+	path = "/path/to/file"
+	A_.lob {
+		path     : path
+		
+		stat     : (cb) -> fs.stat,     path, cb
+		contents : (cb) -> fs.readFile, path, cb
+	}, (err) ->
+		console.log err or @
+
+FLOB
+Like lob, but only accepts functions and not fixed values.
+
 COLLECTOR
 
 	readPath = (path, pathInfoCb) ->
