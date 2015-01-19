@@ -4,10 +4,11 @@ LIMIT_MAX_RUNNING_DEFAULT = 16
 # declared as local variables if they haven't been defined by the environment:
 `
 if (require) var _ = require('underscore');
-
-//if (typeof(window) != 'undefined' && typeof(exports) == 'undefined')
-//	var exports = window.A_ = {};
 `
+#if (typeof(window) != 'undefined' && typeof(exports) == 'undefined') {
+A_ = if typeof(exports) isnt 'undefined' then exports else (window.A_ = {})
+
+
 
 ###
 Most functions passed to Ascore's API have to be asynchronous. (Not really, but
@@ -22,20 +23,22 @@ wrap2Arg = (f, ctx) -> (a, b,       cb) -> cb null, f.call ctx or @, a, b
 wrap3Arg = (f, ctx) -> (a, b, c,    cb) -> cb null, f.call ctx or @, a, b, c
 wrap4Arg = (f, ctx) -> (a, b, c, d, cb) -> cb null, f.call ctx or @, a, b, c, d
 
-exports.wrap0Arg = exports.w0A = wrap0Arg
-exports.wrap1Arg = exports.w1A = wrap1Arg
-exports.wrap2Arg = exports.w2A = wrap2Arg
-exports.wrap3Arg = exports.w3A = wrap3Arg
-exports.wrap4Arg = exports.w4A = wrap4Arg
+A_.wrap0Arg = A_.w0A = wrap0Arg
+A_.wrap1Arg = A_.w1A = wrap1Arg
+A_.wrap2Arg = A_.w2A = wrap2Arg
+A_.wrap3Arg = A_.w3A = wrap3Arg
+A_.wrap4Arg = A_.w4A = wrap4Arg
+
+#console.log A_
 
 # And the general solution:
-exports.wrapFun =
+A_.wrapFun =
 wrapFun = (fun, ctx = null) ->
 	(args..., cb) ->
 		cb null, fun.apply ctx or @, args
 
 # Catches any errors and passes them to the callback:
-exports.wrapFunWithCatch =
+A_.wrapFunWithCatch =
 wrapFunWithCatch = (fun, ctx = null) ->
 	(args..., cb) ->
 		try
@@ -50,7 +53,7 @@ wrapFunWithCatch = (fun, ctx = null) ->
 			cb null, val
 
 
-exports.each =
+A_.each =
 each = (arr, doItem, doneCb) ->			
 	if not _.isFunction doneCb # Valid map callback?
 		throw new InvalidDoneCbError "Done callback not a valid function: #{doneCb}"
@@ -72,7 +75,7 @@ each = (arr, doItem, doneCb) ->
 	else 
 		_each arr, doItem, doneCb
 
-exports.sloppyEach =
+A_.sloppyEach =
 sloppyEach = (arr, doItem, doneCb) ->
 	if _.isFunction arr
 		arr (err, arr) ->
@@ -123,11 +126,11 @@ makeEacherFun = (each) ->
 				each arr, doItem, doneCb
 
 
-exports.eacher       = eacher       = makeEacherFun each
-exports.sloppyEacher = sloppyEacher = makeEacherFun sloppyEach
+A_.eacher       = eacher       = makeEacherFun each
+A_.sloppyEacher = sloppyEacher = makeEacherFun sloppyEach
 
 
-exports.map =
+A_.map =
 map = (arr, vals, doItem, mapCb = null) ->
 	if mapCb is null
 		[vals, doItem, mapCb] = [null, vals, doItem]
@@ -160,7 +163,7 @@ map = (arr, vals, doItem, mapCb = null) ->
 	else
 		_map arr, vals, doItem, mapCb
 
-exports.sloppyMap =
+A_.sloppyMap =
 sloppyMap = (arr, vals, doItem, mapCb = null) ->
 	if mapCb is null
 		[vals, doItem, mapCb] = [null, vals, doItem]
@@ -228,15 +231,15 @@ makeMapperFun = (map) ->
 					
 					map arr, vals, doItem, mapCb
 
-exports.mapper       = mapper       = makeMapperFun map
-exports.sloppyMapper = sloppyMapper = makeMapperFun sloppyMap
+A_.mapper       = mapper       = makeMapperFun map
+A_.sloppyMapper = sloppyMapper = makeMapperFun sloppyMap
 
 
 ###
 Like each or map, but results are passed to pushItem, in order, when they become
 available. (Any errors are passed to doneCb.)
 ###
-exports.push =
+A_.push =
 push = (arr, doItem, pushItem, doneCb) ->
 	if not _.isFunction doneCb
 		throw new InvalidDoneCbError "Done callback not a valid function: #{doneCb}"
@@ -252,7 +255,7 @@ push = (arr, doItem, pushItem, doneCb) ->
 	
 	_push arr, doItem, pushItem, doneCb
 
-exports.sloppyPush =
+A_.sloppyPush =
 _push = (arr, doItem, pushItem, doneCb) ->
 	offset  = 0
 	vals    = []
@@ -283,7 +286,7 @@ _push = (arr, doItem, pushItem, doneCb) ->
 						doneCb null
 
 ###
-exports.sloppySlide =
+A_.sloppySlide =
 _slide = (arr, pushItemFuns..., doneCb) ->
 	vals    = [ arr ]
 	offsets = [ 0 ]
@@ -308,7 +311,7 @@ _slide = (arr, pushItemFuns..., doneCb) ->
 					doneCb null
 ###
 
-exports.eachPair =
+A_.eachPair =
 eachPair = (arr, doPair, eachPairCb) ->
 	errord = no
 	
@@ -338,7 +341,7 @@ eachPair = (arr, doPair, eachPairCb) ->
 						eachPairCb null
 		i += 2
 
-exports.mapPairs =
+A_.mapPairs =
 mapPairs = (arr, doPair, mapPairsCb) ->
 	vals = []
 	eachPair arr, (a, b, i, cb) ->
@@ -358,7 +361,7 @@ DISCLAIMER: Unless the existence of this function is justified (over using an
 async map and a regular reduce), it is expected to be removed in a later
 release. Use at your own risk!
 ###
-exports.reduce =
+A_.reduce =
 reduce = (arr, defaultVal, combine, reduceCb = null) ->
 	if reduceCb is null
 		[defaultVal, combine, reduceCb] = [undefined, defaultVal, combine]
@@ -406,13 +409,13 @@ _reduce = (arr, defaultVal, combine, reduceCb, run = 0) ->
 			else
 				_reduce vals, defaultVal, combine, reduceCb, run + 1
 
-exports.reducer =
+A_.reducer =
 reducer = (defaultVal, combine) ->
 	(arr, reduceCb) ->
 		reduce arr, defaultVal, combine, reduceCb
 
 
-exports.filter =
+A_.filter =
 filter = (arr, doItem, filterCb) ->
 	if not _.isFunction filterCb # Valid map callback?
 		throw new InvalidFilterCbError "Callback for filtered values not a valid function: #{filterCb}"
@@ -436,7 +439,7 @@ filter = (arr, doItem, filterCb) ->
 	else
 		_filter arr, doItem, filterCb
 
-exports.sloppyFilter =
+A_.sloppyFilter =
 sloppyFilter = (arr, doItem, filterCb) ->
 	if _.isFunction arr
 		arr (err, arr) ->
@@ -481,8 +484,8 @@ makeFiltererFun = (filter) ->
 		(arr, filterCb) ->
 			filter arr, doItem, filterCb
 
-exports.filterer       = filterer       = makeFiltererFun filter
-exports.sloppyFilterer = sloppyFilterer = makeFiltererFun sloppyFilter
+A_.filterer       = filterer       = makeFiltererFun filter
+A_.sloppyFilterer = sloppyFilterer = makeFiltererFun sloppyFilter
 
 
 collectItem = (item, valCb) ->
@@ -497,12 +500,12 @@ fcollectItem = (item, valCb) ->
 	else
 		item valCb
 
-exports.collect  =  collect = mapper  collectItem
-exports.fcollect = fcollect = mapper fcollectItem
+A_.collect  =  collect = mapper  collectItem
+A_.fcollect = fcollect = mapper fcollectItem
 
-exports.collector  =  collector = (vals = {}) ->
+A_.collector  =  collector = (vals = {}) ->
 	mapper null, vals,  collectItem
-exports.fcollector = fcollector = (vals = {}) ->
+A_.fcollector = fcollector = (vals = {}) ->
 	mapper null, vals, fcollectItem
 
 
@@ -511,18 +514,18 @@ makeLobFun = (collect) ->
 		collect vals, (err, vals) ->
 			lobCb.call vals, err # Make values accessible through this in callback
 		
-exports.lob  =  lob = makeLobFun  collect
-exports.flob = flob = makeLobFun fcollect
+A_.lob  =  lob = makeLobFun  collect
+A_.flob = flob = makeLobFun fcollect
 
-exports.lobber =
+A_.lobber =
 lobber = (ctx = {}) ->
 	makeLobFun  collector ctx
-exports.flobber =
+A_.flobber =
 flobber = (ctx = {}) ->
 	makeLobFun fcollector ctx
 
 
-exports.limit =
+A_.limit =
 limit = (maxRunning, fun = null) ->
 	if fun is null
 		[maxRunning, fun] = [LIMIT_MAX_RUNNING_DEFAULT, maxRunning]
@@ -561,34 +564,34 @@ limit = (maxRunning, fun = null) ->
 		tryFun @, args
 
 
-exports.sequence = exports.seq =
+A_.sequence = A_.seq =
 sequence = (funs..., doneOrErrCb) ->
 	_sequence funs, doneOrErrCb, [], {}
 
-exports.bindSequenceFunction = exports.bindSeqFun =
+A_.bindSequenceFun = A_.bindSeqFun =
 bindSeqFun = (ctx) ->
 	(funs..., doneOrErrCb) ->
 		_sequence funs, doneOrErrCb, [], ctx
 
-exports.bindSequence =
+A_.bindSequence =
 bindSeq = (ctx, funs..., doneOrErrCb) ->
 	_sequence funs, doneOrErrCb, [], ctx
 
-exports.sequencer = exports.seqer =
+A_.sequencer = A_.seqer =
 sequencer = (funs...) ->
 	(args..., doneOrErrCb) ->
 		_funs = funs.slice 0 # Copy array
 		
 		_sequence _funs, doneOrErrCb, args, {}
 
-exports.bindSequencer = exports.bindSeqer =
+A_.bindSequencer = A_.bindSeqer =
 bindSeqer = (ctx, funs...) ->
 	(args..., doneOrErrCb) ->
 		_funs = funs.slice 0 # Copy array
 		
 		_sequence _funs, doneOrErrCb, args, ctx
 
-exports.decorateWithSequencer = exports.decSeqer =
+A_.decorateWithSequencer = A_.decSeqer =
 decSeqer = (funs...) ->
 	(args..., doneOrErrCb) ->
 		_funs = funs.slice 0 # Copy array
@@ -607,7 +610,7 @@ _sequence = (funs, doneOrErrCb, args, ctx) ->
 		doneOrErrCb.apply ctx, [ null ].concat args
 
 
-exports.chainTriggersTo =
+A_.chainTriggersTo =
 chainTriggersTo = (checkForErr, doneCb = null, doneCbCtx = null) ->
 	if doneCbCtx is null
 		if doneCb is null
@@ -676,7 +679,7 @@ chainTriggersTo = (checkForErr, doneCb = null, doneCbCtx = null) ->
 				, 0
 
 
-exports.chainBindingsTo = (checkForErr, doneCb = null, doneCbCtx) ->
+A_.chainBindingsTo = (checkForErr, doneCb = null, doneCbCtx = null) ->
 	if doneCb is null
 		[checkForErr, doneCb] = [no, checkForErr]
 		
@@ -751,19 +754,19 @@ exports.chainBindingsTo = (checkForErr, doneCb = null, doneCbCtx) ->
 				, 0	
 					
 
-exports.Error = class AError extends Error
+A_.Error = class AError extends Error
 	constructor : (@message) ->
 		Error.call @, message
 						
 		Error.captureStackTrace @, arguments.callee
 
-exports.InvalidDoneCbError     = class InvalidDoneCbError     extends AError
-exports.InvalidMapCbError      = class InvalidMapCbError      extends AError
-exports.InvalidReduceCbError   = class InvalidReduceCbError   extends AError
-exports.InvalidItemCbError     = class InvalidItemCbError     extends AError
-exports.InvalidPushItemError   = class InvalidPushItemError   extends AError
-exports.InvalidCombineFunError = class InvalidCombineFunError extends AError
-exports.InvalidArrError        = class InvalidArrError        extends AError
-exports.InvalidValsError       = class InvalidValsError       extends AError
-exports.InvalidFilterCbError   = class InvalidFilterCbError   extends AError
-exports.InvalidFCollectItem    = class InvalidFCollectItem    extends AError
+A_.InvalidDoneCbError     = class InvalidDoneCbError     extends AError
+A_.InvalidMapCbError      = class InvalidMapCbError      extends AError
+A_.InvalidReduceCbError   = class InvalidReduceCbError   extends AError
+A_.InvalidItemCbError     = class InvalidItemCbError     extends AError
+A_.InvalidPushItemError   = class InvalidPushItemError   extends AError
+A_.InvalidCombineFunError = class InvalidCombineFunError extends AError
+A_.InvalidArrError        = class InvalidArrError        extends AError
+A_.InvalidValsError       = class InvalidValsError       extends AError
+A_.InvalidFilterCbError   = class InvalidFilterCbError   extends AError
+A_.InvalidFCollectItem    = class InvalidFCollectItem    extends AError
