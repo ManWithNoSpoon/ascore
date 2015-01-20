@@ -1,13 +1,15 @@
 LIMIT_MAX_RUNNING_DEFAULT = 16
 
-# Use embedded JavaScript to declare _ and exports, so that they are only
-# declared as local variables if they haven't been defined by the environment:
+# Use embedded JavaScript to declare _, so that it is only declared as a local
+# variable if it hasn't been defined by the environment:
+`if (typeof(require) != 'undefined') {
+	var _ = require('underscore');
+} else {
+	var _ = window._;
+}
 `
-if (require) var _ = require('underscore');
-`
-#if (typeof(window) != 'undefined' && typeof(exports) == 'undefined') {
-A_ = if typeof(exports) isnt 'undefined' then exports else (window.A_ = {})
 
+A_ = if typeof(exports) isnt 'undefined' then exports else (window.A_ = {})
 
 
 ###
@@ -29,7 +31,6 @@ A_.wrap2Arg = A_.w2A = wrap2Arg
 A_.wrap3Arg = A_.w3A = wrap3Arg
 A_.wrap4Arg = A_.w4A = wrap4Arg
 
-#console.log A_
 
 # And the general solution:
 A_.wrapFun =
@@ -454,14 +455,17 @@ _filter = (arr, doItem, filterCb) ->
 	vals = if _.isArray(arr) then [] else {}
 	
 	_each arr, (item, i, doneCb) ->
-		doItem item, (err, keep) ->
-			if err
-				doneCb err
+		if item is undefined
+			doneCb (new InvalidFilterItemError "Array passed to A_.filter() should not contain undefined, use null instead")
+		else
+			doItem item, (err, keep) ->
+				if err
+					doneCb err
 			
-			else
-				if keep then vals[i] = item
+				else
+					if keep then vals[i] = item
 			
-				doneCb null
+					doneCb null
 			
 	, (err) ->
 		if err
@@ -469,7 +473,7 @@ _filter = (arr, doItem, filterCb) ->
 		
 		else
 			if _.isArray arr
-				vals = _.filter vals, (val) -> val != undefined
+				vals = _.filter vals, (val) -> val isnt undefined
 			
 			filterCb null, vals
 	
@@ -518,11 +522,9 @@ A_.lob  =  lob = makeLobFun  collect
 A_.flob = flob = makeLobFun fcollect
 
 A_.lobber =
-lobber = (ctx = {}) ->
-	makeLobFun  collector ctx
+lobber  = (ctx = {}) -> makeLobFun  collector ctx
 A_.flobber =
-flobber = (ctx = {}) ->
-	makeLobFun fcollector ctx
+flobber = (ctx = {}) ->	makeLobFun fcollector ctx
 
 
 A_.limit =
@@ -763,6 +765,7 @@ A_.Error = class AError extends Error
 A_.InvalidDoneCbError     = class InvalidDoneCbError     extends AError
 A_.InvalidMapCbError      = class InvalidMapCbError      extends AError
 A_.InvalidReduceCbError   = class InvalidReduceCbError   extends AError
+A_.InvalidFilterItemError = class InvalidFilterItemError extends AError
 A_.InvalidItemCbError     = class InvalidItemCbError     extends AError
 A_.InvalidPushItemError   = class InvalidPushItemError   extends AError
 A_.InvalidCombineFunError = class InvalidCombineFunError extends AError
