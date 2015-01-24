@@ -1,13 +1,8 @@
 LIMIT_MAX_RUNNING_DEFAULT = 16
 
-# Use embedded JavaScript to declare _, so that it is only declared as a local
-# variable if it hasn't been defined by the environment:
-`if (typeof(require) != 'undefined') {
-	var _ = require('underscore');
-} else {
-	var _ = window._;
-}
-`
+
+_ = if typeof(require) isnt 'undefined' then require 'underscore' else window._
+
 
 A_ = if typeof(exports) isnt 'undefined' then exports else (window.A_ = {})
 
@@ -114,7 +109,8 @@ _each = (arr, doItem, doneCb) ->
 
 makeEacherFun = (each) ->
 	(arr, doItem = null) ->
-		[arr, doItem] = [null, arr]
+		if doItem is null
+			[arr, doItem] = [null, arr]
 		
 		if not _.isFunction doItem # Valid item callback?
 			throw new InvalidItemCbError "Item callback not a valid function: #{doItem}"
